@@ -16,11 +16,9 @@ public abstract class Maths {
             return Collections.singleton(new Pair(1, 1));
         }
 
-        return IntStream.range(1, (int) Math.ceil(Math.sqrt(a)))
+        return IntStream.range(1, (int) Math.ceil(Math.sqrt(a) + 1))
                 .filter(x -> a % x == 0)
-                .mapToObj(x -> Arrays.asList(new Pair(x, a / x), new Pair(a / x, x)))
-                .map(List::stream)
-                .flatMap(Stream::distinct)
+                .mapToObj(x -> new Pair(x, a / x))
                 .collect(Collectors.toSet());
     }
 }

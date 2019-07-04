@@ -2,9 +2,9 @@ package structures;
 
 import solver.Solver;
 
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Rectangle {
@@ -25,41 +25,40 @@ public class Rectangle {
         return dimensions.x * dimensions.y;
     }
 
-    public Pair topLeft() {
-        return this.dimensions;
+    public boolean overlapsWith(Rectangle r) {
+        return positions.x < r.positions.x + r.dimensions.x
+                && positions.x + dimensions.x > r.positions.x
+                && positions.y < r.positions.y + r.dimensions.y
+                && positions.y + dimensions.y > r.positions.y;
     }
 
-    public Pair topRight() {
-        return new Pair(positions.x + dimensions.x, positions.y);
+    public boolean overlapsWithAny(HashSet<Rectangle> overlaps, List<? extends Rectangle> others) {
+        if (overlaps.contains(this))
+            return true;
+
+        Optional<? extends Rectangle> firstOverlap = others
+                .stream()
+                .filter(r -> !this.equals(r))
+                .filter(this::overlapsWith)
+                .findFirst();
+
+        firstOverlap.ifPresent(overlap -> {
+            overlaps.add(overlap);
+            overlaps.add(this);
+        });
+
+        return firstOverlap.isPresent();
     }
 
-    public Pair bottomLeft() {
-        return new Pair(positions.x, positions.y + dimensions.y);
-    }
+    public List<Piece> breakIntoSubPieces(Mosaic mosaic, int maxArea) {
+        if (maxArea < 2)
+            return Collections.emptyList();
 
-    public Pair bottomRight() {
-        return new Pair(positions.x + dimensions.x, positions.y + dimensions.y);
-    }
+        List<Piece> subPieces = Solver.getPossiblyOverlappingPieces(mosaic, this, maxArea);
 
-    public boolean overlapsWith(Rectangle other) {
-        if (this.topRight().y < other.bottomLeft().y
-                || this.bottomLeft().y > other.topRight().y) {
-            return false;
-        }
-
-        if (this.topRight().x < other.bottomLeft().x
-                || this.bottomLeft().x > other.topRight().x) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean overlapsWithAny(List<? extends Rectangle> others) {
-        return others.stream().anyMatch(this::overlapsWith);
-    }
-
-    public List<Piece> breakIntoSubPieces(Mosaic mosaic, int maxArea)  {
-        return Solver.getPossiblyOverlappingPieces(mosaic, this, maxArea);
+        if (subPieces.isEmpty())
+            return breakIntoSubPieces(mosaic, maxArea - 1);
+        else
+            return subPieces;
     }
 }

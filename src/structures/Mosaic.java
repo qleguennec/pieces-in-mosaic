@@ -1,6 +1,7 @@
 package structures;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Mosaic extends Rectangle {
     public int minCellsEachColorByPiece;
@@ -10,7 +11,6 @@ public class Mosaic extends Rectangle {
     public Mosaic(int x, int y, int w, int h) {
         super(x, y, w, h);
     }
-
 
     public boolean checkValid(Piece piece) {
         long nWhites = piece.cells.stream().filter(Boolean::booleanValue).count();

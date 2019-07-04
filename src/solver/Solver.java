@@ -6,6 +6,7 @@ import structures.Piece;
 import structures.Rectangle;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -24,8 +25,8 @@ public abstract class Solver {
                     int h = pair.y;
                     ArrayList<Piece> nWhitesBlacks = new ArrayList<>();
 
-                    for (int i = 0; i + h <= region.dimensions.y; i++) {
-                        for (int j = 0; j + w <= region.dimensions.x; j++) {
+                    for (int i = region.positions.y; i + h <= region.dimensions.y; i++) {
+                        for (int j = region.positions.x; j + w <= region.dimensions.x; j++) {
                             Piece piece = mosaic.getPieceInArea(new Rectangle(j, i, w, h), mosaic);
                             if (piece != null) {
                                 nWhitesBlacks.add(piece);
@@ -43,9 +44,11 @@ public abstract class Solver {
     }
 
     public static List<Piece> resolveOverlaps(Mosaic mosaic, List<Piece> pieces) {
+        HashSet<Rectangle> overlaps = new HashSet<>();
+
         return pieces
                 .stream()
-                .collect(Collectors.partitioningBy(piece -> piece.overlapsWithAny(pieces)))
+                .collect(Collectors.partitioningBy(piece -> piece.overlapsWithAny(overlaps, pieces)))
                 .entrySet()
                 .stream()
                 .flatMap(entry -> {
