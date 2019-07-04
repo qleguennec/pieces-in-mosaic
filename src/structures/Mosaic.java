@@ -1,42 +1,52 @@
 package structures;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 public class Mosaic extends Rectangle {
     public int minCellsEachColorByPiece;
     public int maxCellsByPiece;
-    public boolean[][] cells;
+    public Pair<Boolean, Integer>[][] cells;
+
+    private int piecesCommitted;
 
     public Mosaic(int x, int y, int w, int h) {
         super(x, y, w, h);
+        piecesCommitted = 0;
     }
 
-    public boolean checkValid(Piece piece) {
-        long nWhites = piece.cells.stream().filter(Boolean::booleanValue).count();
-        long nBlacks = piece.cells.size() - nWhites;
-
-        return (nWhites >= minCellsEachColorByPiece && nBlacks >= minCellsEachColorByPiece);
-    }
-
-
-    public Piece getPieceInArea(Rectangle area, Rectangle bounds) {
+    private Piece getNewPiece(Rectangle area) {
         Piece piece = new Piece(area);
-        piece.cells = new ArrayList<>();
+        int nWhites = 0, nBlacks = 0;
 
-        for (int i = piece.positions.y; i < piece.positions.y + piece.dimensions.y; i++) {
-            for (int j = piece.positions.x; j < piece.positions.x + piece.dimensions.x; j++)
-                piece.cells.add(cells[i][j]);
+        for (int i = area.position.y; i < area.position.y + area.dimension.y; i++) {
+            for (int j = area.position.x; j < area.position.x + area.dimension.x; j++) {
+                if (cells[i][j].y != null)
+                    return null;
+
+                piece.cells.add(new Pair<>(j, i));
+
+                if (this.cells[i][j].x)
+                    nWhites++;
+                else nBlacks++;
+            }
         }
 
-        if (checkValid(piece))
-            return piece;
+        return nWhites >= minCellsEachColorByPiece && nBlacks >= minCellsEachColorByPiece ? piece : null;
+    }
 
-        return null;
+    public Piece commitNewPiece(Rectangle area) {
+        Piece newPiece = getNewPiece(area);
+
+        if (newPiece == null)
+            return null;
+
+        newPiece.cells
+                .forEach(pair -> cells[(int) pair.y][(int) pair.x].y = piecesCommitted);
+
+        piecesCommitted++;
+        return newPiece;
     }
 
     @Override public String toString() {
         return String.format("Mosaic %dx%d with max cells par piece %d and %d min cells of each color",
-                dimensions.y, dimensions.x, maxCellsByPiece, minCellsEachColorByPiece);
+                dimension.y, dimension.x, maxCellsByPiece, minCellsEachColorByPiece);
     }
 }

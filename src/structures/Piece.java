@@ -1,15 +1,13 @@
 package structures;
 
-import solver.Overlap;
-import solver.Solver;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Piece extends Rectangle {
-    public List<Boolean> cells;
+    List<Pair> cells;
 
-    public Piece(Rectangle area) {
+    Piece(Rectangle area) {
         super(area);
+        cells = new ArrayList<>();
     }
 }

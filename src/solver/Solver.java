@@ -5,69 +5,50 @@ import structures.Pair;
 import structures.Piece;
 import structures.Rectangle;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public abstract class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
 
-    public static List<Piece> getPossiblyOverlappingPieces(Mosaic mosaic, Rectangle region, int maxArea) {
-        Set<Pair> factors = Maths.findFactors(maxArea);
+    private static ArrayList<Piece> tryForDimensions(Mosaic mosaic, Pair<Integer, Integer> dimensions) {
+        ArrayList<Piece> pieces = new ArrayList<>();
+        Piece piece;
 
-        List<Piece> possiblyOverlappingPieces = factors.stream()
-                .map(pair -> {
-                    int w = pair.x;
-                    int h = pair.y;
-                    ArrayList<Piece> nWhitesBlacks = new ArrayList<>();
+        for (int i = 0; i + dimensions.y <= mosaic.dimension.y; i++) {
+            for (int j = 0; j + dimensions.x <= mosaic.dimension.x; j++) {
+                piece = mosaic.commitNewPiece(new Rectangle(j, i, dimensions.x, dimensions.y));
+                if (piece != null)
+                    pieces.add(piece);
+            }
+        }
 
-                    for (int i = region.positions.y; i + h <= region.dimensions.y; i++) {
-                        for (int j = region.positions.x; j + w <= region.dimensions.x; j++) {
-                            Piece piece = mosaic.getPieceInArea(new Rectangle(j, i, w, h), mosaic);
-                            if (piece != null) {
-                                nWhitesBlacks.add(piece);
-                            }
-                        }
-                    }
-
-                    return nWhitesBlacks;
-                })
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-
-        LOGGER.log(Level.INFO, "Found {0} (possibly overlapping) pieces", possiblyOverlappingPieces.size());
-        return possiblyOverlappingPieces;
+        return pieces;
     }
 
-    public static List<Piece> resolveOverlaps(Mosaic mosaic, List<Piece> pieces) {
-        HashSet<Rectangle> overlaps = new HashSet<>();
+    public static ArrayList<Piece> solve(Mosaic mosaic) {
+        int piecesArea = mosaic.maxCellsByPiece;
+        int commited = 0;
 
-        return pieces
-                .stream()
-                .collect(Collectors.partitioningBy(piece -> piece.overlapsWithAny(overlaps, pieces)))
-                .entrySet()
-                .stream()
-                .flatMap(entry -> {
-                    if (entry.getKey()) {
-                        LOGGER.log(Level.INFO, "Found {0} overlaps", entry.getValue().size());
-                        return entry
-                                .getValue()
-                                .stream()
-                                .map(piece -> ((Rectangle) piece)
-                                        .breakIntoSubPieces(mosaic, piece.getArea()))
-                                .flatMap(List::stream);
-                    } else {
-                        return entry.getValue().stream();
-                    }
-                }).collect(Collectors.toList());
-    }
+        ArrayList<Piece> totalPieces = new ArrayList<>();
 
-    public static List<Piece> solve(Mosaic mosaic) {
-        List<Piece> possiblyOverlappingPieces = mosaic.breakIntoSubPieces(mosaic, mosaic.maxCellsByPiece);
-        return resolveOverlaps(mosaic, possiblyOverlappingPieces);
+        while (piecesArea >= 2) {
+            List<Pair<Integer, Integer>> factors = Math.findFactors(piecesArea);
+
+            List<Piece> commitedPieces = factors.stream()
+                    .map(factor -> tryForDimensions(mosaic, factor))
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+
+            commited += commitedPieces.size();
+
+            LOGGER.info(String.format("Commited %d pieces of area %s", commited, factors.get(0).x * factors.get(0).y));
+
+            totalPieces.addAll(commitedPieces);
+            piecesArea--;
+        }
+
+        return totalPieces;
     }
 }
