@@ -1,3 +1,5 @@
+package solver;
+
 import structures.Pair;
 
 import java.util.Arrays;
@@ -7,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Maths {
+public abstract class Maths {
    public static Set<Pair> findFactors(int a) {
        return IntStream.range(1, (int) Math.ceil(Math.sqrt(a)))
               .filter(x -> a % x == 0)

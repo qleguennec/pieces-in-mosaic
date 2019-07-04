@@ -1,5 +1,8 @@
 package structures;
 
+import solver.Overlap;
+import solver.Solver;
+
 import java.util.ArrayList;
 import java.util.List;
 

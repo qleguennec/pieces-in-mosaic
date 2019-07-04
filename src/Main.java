@@ -1,3 +1,4 @@
+import solver.Solver;
 import structures.Mosaic;
 import structures.Pair;
 import structures.Piece;
@@ -14,7 +15,7 @@ public class Main {
 
     private static Mosaic readMosaic() throws IOException {
         URL url = Main.class.getResource("main/resources/mosaic.in");
-        String content = Files.readString(Paths.get(url.getPath()));
+        String content = new String(Files.readAllBytes(Paths.get(url.getPath())));
         String[] lines = content.split("\\n");
         String header = lines[0];
         String[] split = header.split("\\s");
@@ -44,27 +45,8 @@ public class Main {
             return ;
         }
 
-        Set<Pair> factors = Maths.findFactors(mosaic.maxCellsByPiece);
+        List<Piece> solve = Solver.solve(mosaic);
 
-        List<ArrayList<Piece>> rectsMaxArea = factors.stream()
-                .map(pair -> {
-                    int w = pair.x;
-                    int h = pair.y;
-                    ArrayList<Piece> nWhitesBlacks = new ArrayList<>();
-
-                    for (int i = 0; i < mosaic.dimensions.y; i++) {
-                        for (int j = 0; j < mosaic.dimensions.x; j++) {
-                            Piece piece = mosaic.getPieceInArea(new Rectangle(j, i, w, h));
-                            if (piece != null) {
-                                nWhitesBlacks.add(piece);
-                            }
-                        }
-                    }
-
-                    return nWhitesBlacks;
-                }).collect(Collectors.toList());
-
-        factors.size();
-
+        int a = 0;
     }
 }
