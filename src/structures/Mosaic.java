@@ -20,12 +20,12 @@ public class Mosaic extends Rectangle {
     }
 
 
-    public Piece getPieceInArea(Rectangle area) {
+    public Piece getPieceInArea(Rectangle area, Rectangle bounds) {
         Piece piece = new Piece(area);
         piece.cells = new ArrayList<>();
 
-        for (int i = piece.positions.y; i < piece.dimensions.y; i++) {
-            for (int j = piece.positions.x; j < piece.dimensions.x; j++)
+        for (int i = piece.positions.y; i < piece.positions.y + piece.dimensions.y; i++) {
+            for (int j = piece.positions.x; j < piece.positions.x + piece.dimensions.x; j++)
                 piece.cells.add(cells[i][j]);
         }
 
@@ -33,5 +33,10 @@ public class Mosaic extends Rectangle {
             return piece;
 
         return null;
+    }
+
+    @Override public String toString() {
+        return String.format("Mosaic %dx%d with max cells par piece %d and %d min cells of each color",
+                dimensions.y, dimensions.x, maxCellsByPiece, minCellsEachColorByPiece);
     }
 }

@@ -59,7 +59,7 @@ public class Rectangle {
         return others.stream().anyMatch(this::overlapsWith);
     }
 
-    public List<Piece> breakIntoSubPieces(Mosaic mosaic)  {
-        return Solver.getPossiblyOverlappingPieces(mosaic, this, getArea() - 1);
+    public List<Piece> breakIntoSubPieces(Mosaic mosaic, int maxArea)  {
+        return Solver.getPossiblyOverlappingPieces(mosaic, this, maxArea);
     }
 }
