@@ -51,7 +51,7 @@ abstract class IO {
                         piece.position.y,
                         piece.position.x,
                         piece.position.y + piece.dimension.y,
-                        piece.position.x + piece.position.x)
+                        piece.position.x + piece.dimension.x)
                         .stream()
                         .map(Objects::toString)
                         .collect(Collectors.joining(" ")))

@@ -29,7 +29,6 @@ public abstract class Solver {
 
     public static ArrayList<Piece> solve(Mosaic mosaic) {
         int piecesArea = mosaic.maxCellsByPiece;
-        int commited = 0;
 
         ArrayList<Piece> totalPieces = new ArrayList<>();
 
@@ -41,9 +40,8 @@ public abstract class Solver {
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
 
-            commited += commitedPieces.size();
-
-            LOGGER.info(String.format("Commited %d pieces of area %s", commited, factors.get(0).x * factors.get(0).y));
+            LOGGER.info(String.format("Commited %d pieces of area %s", commitedPieces.size(),
+                    factors.get(0).x * factors.get(0).y));
 
             totalPieces.addAll(commitedPieces);
             piecesArea--;
