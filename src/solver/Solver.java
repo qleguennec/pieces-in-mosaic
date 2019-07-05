@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 public abstract class Solver {
     private static final Logger LOGGER = Logger.getLogger(Solver.class.getName());
 
-    private static ArrayList<Piece> tryForDimensions(Mosaic mosaic, Pair<Integer, Integer> dimensions) {
+    private static ArrayList<Piece> tryForDimensions(Mosaic mosaic, Pair<Integer, Integer> dimension) {
         ArrayList<Piece> pieces = new ArrayList<>();
         Piece piece;
 
-        for (int i = 0; i + dimensions.y <= mosaic.dimension.y; i++) {
-            for (int j = 0; j + dimensions.x <= mosaic.dimension.x; j++) {
-                piece = mosaic.commitNewPiece(new Rectangle(j, i, dimensions.x, dimensions.y));
+        for (int i = 0; i + dimension.y <= mosaic.dimension.y; i++) {
+            for (int j = 0; j + dimension.x <= mosaic.dimension.x; j++) {
+                piece = mosaic.commitNewPiece(new Rectangle(j, i, dimension.x, dimension.y));
                 if (piece != null)
                     pieces.add(piece);
             }
